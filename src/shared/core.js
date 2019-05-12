@@ -30,7 +30,9 @@ const ANY_CJK = new RegExp(`[${CJK}]`);
 
 // the symbol part only includes ~ ! ; : , . ? but . only matches one character
 const CONVERT_TO_FULLWIDTH_CJK_SYMBOLS_CJK = new RegExp(`([${CJK}])[ ]*([\\:]+|\\.)[ ]*([${CJK}])`, 'g');
-const CONVERT_TO_FULLWIDTH_CJK_SYMBOLS = new RegExp(`([${CJK}])[ ]*([~\\!;,\\?]+)[ ]*`, 'g');
+const CONVERT_TO_FULLWIDTH_CJK_SYMBOLS = new RegExp(`([${CJK}])[ ]*([\(\)\-\:~\!;,\\?]+)[ ]*`, 'g');
+const CONVERT_TO_FULLWIDTH_SYMBOLS_CJK = new RegExp(`[ ]*([\(\)\-\:~\!;,\?]+)[ ]*([${CJK}])`, 'g');
+
 const DOTS_CJK = new RegExp(`([\\.]{2,}|\u2026)([${CJK}])`, 'g');
 const FIX_CJK_COLON_ANS = new RegExp(`([${CJK}])\\:([A-Z0-9\\(\\)])`, 'g');
 
@@ -78,6 +80,10 @@ class Pangu {
 
   convertToFullwidth(symbols) {
     return symbols
+      .replace(/--/g,'——')    
+      .replace(/-/g,'——')    
+      .replace(/\(/g,'（')    
+      .replace(/\)/g,'）')       
       .replace(/~/g, '～')
       .replace(/!/g, '！')
       .replace(/;/g, '；')
@@ -123,6 +129,11 @@ class Pangu {
     newText = newText.replace(CONVERT_TO_FULLWIDTH_CJK_SYMBOLS, (match, cjk, symbols) => {
       const fullwidthSymbols = self.convertToFullwidth(symbols);
       return `${cjk}${fullwidthSymbols}`;
+    });
+
+    newText= newText.replace(CONVERT_TO_FULLWIDTH_SYMBOLS_CJK, (match,symbols, cjk, ) => {
+      const fullwidthSymbols = self.convertToFullwidth(symbols);
+      return `${fullwidthSymbols}${cjk}`;
     });
 
     newText = newText.replace(DOTS_CJK, '$1 $2');

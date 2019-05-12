@@ -11,7 +11,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 var CJK = "\u2E80-\u2EFF\u2F00-\u2FDF\u3040-\u309F\u30A0-\u30FA\u30FC-\u30FF\u3100-\u312F\u3200-\u32FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF";
 var ANY_CJK = new RegExp("[".concat(CJK, "]"));
 var CONVERT_TO_FULLWIDTH_CJK_SYMBOLS_CJK = new RegExp("([".concat(CJK, "])[ ]*([\\:]+|\\.)[ ]*([").concat(CJK, "])"), 'g');
-var CONVERT_TO_FULLWIDTH_CJK_SYMBOLS = new RegExp("([".concat(CJK, "])[ ]*([~\\!;,\\?]+)[ ]*"), 'g');
+var CONVERT_TO_FULLWIDTH_CJK_SYMBOLS = new RegExp("([".concat(CJK, "])[ ]*([()-:~!;,\\?]+)[ ]*"), 'g');
+var CONVERT_TO_FULLWIDTH_SYMBOLS_CJK = new RegExp("[ ]*([()-:~!;,?]+)[ ]*([".concat(CJK, "])"), 'g');
 var DOTS_CJK = new RegExp("([\\.]{2,}|\u2026)([".concat(CJK, "])"), 'g');
 var FIX_CJK_COLON_ANS = new RegExp("([".concat(CJK, "])\\:([A-Z0-9\\(\\)])"), 'g');
 var CJK_QUOTE = new RegExp("([".concat(CJK, "])([`\"\u05F4])"), 'g');
@@ -49,7 +50,7 @@ var Pangu = function () {
   _createClass(Pangu, [{
     key: "convertToFullwidth",
     value: function convertToFullwidth(symbols) {
-      return symbols.replace(/~/g, '～').replace(/!/g, '！').replace(/;/g, '；').replace(/:/g, '：').replace(/,/g, '，').replace(/\./g, '。').replace(/\?/g, '？');
+      return symbols.replace(/--/g, '——').replace(/-/g, '——').replace(/\(/g, '（').replace(/\)/g, '）').replace(/~/g, '～').replace(/!/g, '！').replace(/;/g, '；').replace(/:/g, '：').replace(/,/g, '，').replace(/\./g, '。').replace(/\?/g, '？');
     }
   }, {
     key: "spacing",
@@ -72,6 +73,10 @@ var Pangu = function () {
       newText = newText.replace(CONVERT_TO_FULLWIDTH_CJK_SYMBOLS, function (match, cjk, symbols) {
         var fullwidthSymbols = self.convertToFullwidth(symbols);
         return "".concat(cjk).concat(fullwidthSymbols);
+      });
+      newText = newText.replace(CONVERT_TO_FULLWIDTH_SYMBOLS_CJK, function (match, symbols, cjk) {
+        var fullwidthSymbols = self.convertToFullwidth(symbols);
+        return "".concat(fullwidthSymbols).concat(cjk);
       });
       newText = newText.replace(DOTS_CJK, '$1 $2');
       newText = newText.replace(FIX_CJK_COLON_ANS, '$1：$2');
